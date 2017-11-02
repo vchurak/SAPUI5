@@ -1,0 +1,10 @@
+{
+"applications" : { 
+            "MyFioriObject-display" : {
+                "additionalInformation" : "SAPUI5.Component=MyMarket_Digital_Assistant",
+                "applicationType" : "URL",
+                "url" : "/Emma",
+                "description" : "MyMarket Digital Assistant"
+            }
+    }
+}

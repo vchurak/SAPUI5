@@ -16,7 +16,61 @@ sap.ui.define([
 
 	"use strict";
 	var _sIdentity = "nw.epm.refapps.ext.shop";
+    var recognition;
+    var noteContent;
+    
+            try {
+                  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                  recognition = new SpeechRecognition();
+                  noteContent = "";
+                }
+            catch(e) {
+                       jQuery.sap.log.error(e);
+                     }      
+/*-----------------------------
+      Voice Recognition 
+------------------------------*/
 
+// If false, the recording will stop after a few seconds of silence.
+// When true, the silence period is longer (about 15 seconds),
+// allowing us to keep recording even when the user pauses. 
+recognition.continuous = true;
+
+// This block is called every time the Speech APi captures a line. 
+recognition.onresult = function(event) {
+
+  // event is a SpeechRecognitionEvent object.
+  // It holds all the lines we have captured so far. 
+  // We only need the current one.
+  var current = event.resultIndex;
+
+  // Get a transcript of what was said.
+  var transcript = event.results[current][0].transcript;
+
+  // Add the current transcript to the contents of our Note.
+  // There is a weird bug on mobile, where everything is repeated twice.
+  // There is no official solution so far so we have to handle an edge case.
+  var mobileRepeatBug = (current === 1 && transcript === event.results[0][0].transcript);
+
+  if(!mobileRepeatBug) {
+    noteContent += transcript;
+    MessageToast.show(noteContent);
+  }
+};
+
+recognition.onstart = function() { 
+  MessageToast.show("Voice recognition activated. Try speaking into the microphone.");
+};
+
+recognition.onspeechend = function() {
+  MessageToast.show("You were quiet for a while so voice recognition turned itself off.");
+};
+
+recognition.onerror = function(event) {
+  if(event.error === "no-speech") {
+    MessageToast.show("No speech was detected. Try again.");  
+  }
+}; 
 	return BaseController.extend("nw.epm.refapps.ext.shop.controller.S2_ProductList", {
 
 		formatter: formatter,
@@ -73,6 +127,8 @@ sap.ui.define([
 			if (!sap.ui.Device.system.phone) {
 				this.byId("productListPage").insertContent(this._initSFBSubView(), 0);
 			}
+			
+			
 		},
 
 		createGroupHeader: function(oGroup) {
@@ -98,7 +154,40 @@ sap.ui.define([
 				this._oResourceBundle.getText("xtit.productsAndCount", [iItemCount]) :
 				this._oResourceBundle.getText("xtit.products"));
 		},
-
+// --- Start Recognition Handling
+		onStartRecognitionPressed: function() {
+			var msg = "Entering onStartRecognitionPressed\r\n ....Leaving now.";
+			//MessageToast.show(msg);
+            var myBtn = this.byId("btnStartRecognitionHeader");
+            /*			if (!myBtn){
+				msg = 'myBtn is NULL';
+			MessageToast.show(msg);	
+			}*/
+			
+                if (myBtn  && (myBtn.getIcon() === "sap-icon://discussion"  || myBtn.getIcon === "" || myBtn.getIcon === "null") ){
+                  
+                   if(recognition){
+                    recognition.stop();
+                    msg = "Voice recognition paused.";
+                    MessageToast.show(msg); 
+                   }
+                  myBtn.setIcon("sap-icon://sound-off"); // this sets the sap-icon://sound-off icon
+                  
+                } else {
+                	
+                	if(!recognition){
+                       msg = "Sorry, Your Browser Doesn't Support the Web Speech API. Try Opening This App In Google Chrome.";
+                       MessageToast.show(msg);   
+                       return;
+                	}
+                	
+                if (noteContent.length) {
+                   noteContent += ' ';
+                    }
+                recognition.start();	
+                myBtn.setIcon("sap-icon://discussion"); // this removes the sap-icon://sound-off icon
+                }			
+		},
 		// --- Shopping Cart Handling
 		onShoppingCartPressed: function() {
 			this._oRouter.navTo("ShoppingCart", {}, false);

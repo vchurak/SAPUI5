@@ -10,6 +10,12 @@
 				press="onShoppingCartPressed"
 				text="{TotalQuantity}"
 				tooltip="{i18n>xfld.addToCart}"/>
+<!-- if switched off, then icon must be sap-icon://sound-off-->				
+			<ToggleButton id="btnStartRecognitionHeader"
+				icon="sap-icon://sound-off" 
+				pressed="false" 
+				press="onStartRecognitionPressed"
+				tooltip="{i18n>xbut.StartRecognition}"/>				
 		</headerContent>
 		<content>
 			<!-- the smart filter bar is added later by the controller (S2_ProductList.controller.js) if not running on a phone-->
