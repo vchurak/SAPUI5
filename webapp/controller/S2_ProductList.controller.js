@@ -167,6 +167,7 @@ recognition.onerror = function(event) {
                 if (myBtn  && (myBtn.getIcon() === "sap-icon://discussion"  || myBtn.getIcon === "" || myBtn.getIcon === "null") ){
                   
                    if(recognition){
+                   	noteContent = "";
                     recognition.stop();
                     msg = "Voice recognition paused.";
                     MessageToast.show(msg); 
@@ -182,7 +183,7 @@ recognition.onerror = function(event) {
                 	}
                 	
                 if (noteContent.length) {
-                   noteContent += ' ';
+                   noteContent += " ";
                     }
                 recognition.start();	
                 myBtn.setIcon("sap-icon://discussion"); // this removes the sap-icon://sound-off icon
